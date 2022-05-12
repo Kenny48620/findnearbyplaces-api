@@ -8,20 +8,20 @@ const {store} = require('./data_access/store');
 const req = require('express/lib/request');
 const { Pool } = require('pg/lib');
 
-const application = express();
+const app = express();
 const port = process.env.PORT || 4000;
 
 
 //middlewares
-application.use(cors({
+app.use(cors({
     origin: "https://kenny48620.github.io",
     credentials: true
 }));
-application.use(express.json());
+app.use(express.json());
 
 
 
-application.use((request, response, next) => {
+app.use((request, response, next) => {
 
     next();
 })
@@ -43,13 +43,13 @@ passport.use(
 
     }));
 
-application.use(session({
+app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
     store: new SQLiteStore({ db: 'sessions.db', dir: './sessions' })
 }));
-application.use(passport.authenticate('session'));
+app.use(passport.authenticate('session'));
 
 passport.serializeUser(function (user, cb) {
     process.nextTick(function () {
@@ -63,12 +63,12 @@ passport.deserializeUser(function (user, cb) {
     });
 });
 // default
-application.get('/', (req,res) => {
-    res.status(200).json({done: true, message: 'This is default page ''/'' URL for findnearbyplaces '});
+app.get('/', (req,res) => {
+    res.status(200).json({done: true, message: 'This is the default page ''/'' URL for findnearbyplaces '});
 });
  
 //1
-application.get('/search/:search_term/:user_location/:radius_filter/:maximum_results_to_return/:category_filter/:sort', (req, res) => {
+app.get('/search/:search_term/:user_location/:radius_filter/:maximum_results_to_return/:category_filter/:sort', (req, res) => {
     let search_term = req.params.search_term;
     let user_location = req.params.user_location;
     let radius_filter = req.params.radius_filter;
@@ -86,7 +86,7 @@ application.get('/search/:search_term/:user_location/:radius_filter/:maximum_res
     })
 })
 //2
-application.post('/register', (req, res) => {
+app.post('/register', (req, res) => {
     let email = req.body.email;
     let password = req.body.password; /* store will handle encryption */
     store.addCustomer(email, password)
@@ -101,20 +101,20 @@ application.post('/register', (req, res) => {
 
 });
 
-application.post('/login', passport.authenticate('local', {
+app.post('/login', passport.authenticate('local', {
     successRedirect: '/login/succeeded',
     failureRedirect: '/login/failed'
 }));
-application.get('/login/succeeded', (request, response) => {
+app.get('/login/succeeded', (request, response) => {
     response.status(200).json({ done: true, message: 'The customer logged in successfully.' });
 });
 
-application.get('/login/failed', (request, response) => {
+app.get('/login/failed', (request, response) => {
     response.status(401).json({ done: false, message: 'The credentials are not valid.' });
 });
 
 //3
-application.post('/place', (req, res) => {
+app.post('/place', (req, res) => {
     let name = req.body.name;
     let category_id = req.body.category_id;
     let latitude = req.body.latitude;
@@ -134,7 +134,7 @@ application.post('/place', (req, res) => {
 });
 
 //3.1
-application.post('/category', (req, res) => {
+app.post('/category', (req, res) => {
     let name = req.body.name;
     store.postCategory(name)
     .then(x => {
@@ -150,7 +150,7 @@ application.post('/category', (req, res) => {
 });
 
 //4
-application.post('/photo', (req, res) => {
+app.post('/photo', (req, res) => {
     let photo = req.body.photo;
     let place_id = req.body.place_id;
     let review_id = req.body.review_id;
@@ -177,7 +177,7 @@ application.post('/photo', (req, res) => {
 });
 
 //5
-application.post('/review', (req, res) => {
+app.post('/review', (req, res) => {
     let location_id = req.body.place_id;
     let text = req.body.comment;
     let rating = req.body.rating;
@@ -195,7 +195,7 @@ application.post('/review', (req, res) => {
 });
 
 //6
-application.put('/place', (req, res) => {
+app.put('/place', (req, res) => {
     let place_id = req.body.place_id;
     let name = req.body.name;
     let category_id = req.body.category_id;
@@ -213,7 +213,7 @@ application.put('/place', (req, res) => {
 });
 
 //7
-application.put('/review', (req, res) => {
+app.put('/review', (req, res) => {
     let review_id = req.body.review_id;
     let text = req.body.comment;
     let rating = req.body.rating;
@@ -228,7 +228,7 @@ application.put('/review', (req, res) => {
 });
 
 //8
-application.put('/photo', (req, res) => {
+app.put('/photo', (req, res) => {
     let photo_id = req.body.photo_id;
     let file = req.body.photo;
     store.putPhoto(photo_id, file)
@@ -242,7 +242,7 @@ application.put('/photo', (req, res) => {
 });
 
 //9
-application.delete('/place', (req, res) => {
+app.delete('/place', (req, res) => {
     let place_id = req.body.place_id;
     store.deletePlace(place_id)
     .then(x => {
@@ -255,7 +255,7 @@ application.delete('/place', (req, res) => {
 });
 
 //10
-application.delete('/review', (req, res) => {
+app.delete('/review', (req, res) => {
     let review_id = req.body.review_id;
     store.deleteReview(review_id)
     .then(x => {
@@ -268,7 +268,7 @@ application.delete('/review', (req, res) => {
 });
 
 //11
-application.delete('/photo', (req, res) => {
+app.delete('/photo', (req, res) => {
     let photo_id = req.body.photo_id;
     store.deletePhoto(photo_id)
     .then(x => {
@@ -281,12 +281,12 @@ application.delete('/photo', (req, res) => {
 });
 
 //listen
-application.listen(port, () => {
+app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
 
 //logout
-application.post('/logout', (req,res) => {
+app.post('/logout', (req,res) => {
     req.logout();
     res.redirect('/');
 });
