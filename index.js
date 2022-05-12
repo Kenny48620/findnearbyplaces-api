@@ -62,9 +62,9 @@ passport.deserializeUser(function (user, cb) {
         return cb(null, user);
     });
 });
-
+// default
 application.get('/', (req,res) => {
-    res.status(200).json({done: true, message: 'This is the ''/'' URL for findnearbyplaces '});
+    res.status(200).json({done: true, message: 'This is default page ''/'' URL for findnearbyplaces '});
 });
  
 //1
