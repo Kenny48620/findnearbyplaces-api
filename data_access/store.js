@@ -13,9 +13,6 @@ const pool = new Pool(connection);
 
 let store = {
     getSearch: (search_term, user_location, radius_filter, maximum_results_to_return, category_filter, sort) => {
-        //user_location will be a string with two comma separated values, latitude and longitude
-        //required: search_term, user_location, maximum_results_to_return
-        //optional: radius_filter, category_filter, sort
         let query = `select l.name as name, CONCAT(l.latitude,',', l.longitude) as location, c.name as category, r.rating as rating, p.file as thumbnail 
                     from findnearbyplaces.locations l 
                     join findnearbyplaces.category c on c.id = l.category_id   

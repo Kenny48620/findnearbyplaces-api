@@ -10,7 +10,7 @@ const { Pool } = require('pg/lib');
 
 const app = express();
 
-const port = process.env.PORT || 4002;
+const port = process.env.PORT || 4000;
 
 
 //middlewares
@@ -22,13 +22,8 @@ app.use(express.json());
 
 
 
-
 app.use((request, response, next) => {
-    console.log(`request url: ${request.url}`);
-    console.log(`request method: ${request.method}`);
-    //only for development. Remove the next two lines when you deploy your final version.
-    console.log(`request body:`);
-    console.log(request.body);
+
     next();
 })
 
@@ -39,7 +34,7 @@ passport.use(
                 if (x.valid) {
                     return cb(null, x.user);
                 } else {
-                    return cb(null, false, { message: 'Incorrect username or password.' });
+                    return cb(null, false, { message: 'Something went wrong.' });
                 }
             })
             .catch(e => {
@@ -70,7 +65,7 @@ passport.deserializeUser(function (user, cb) {
 });
 
 app.get('/', (req,res) => {
-    res.status(200).json({done: true, message: 'This is the backend for findnearbyplaces '});
+    res.status(200).json({done: true, message: 'This is the ''/'' URL for findnearbyplaces '});
 });
  
 //1
@@ -91,7 +86,6 @@ app.get('/search/:search_term/:user_location/:radius_filter/:maximum_results_to_
         }
     })
 })
-
 //2
 app.post('/register', (req, res) => {
     let email = req.body.email;
@@ -103,7 +97,7 @@ app.post('/register', (req, res) => {
         })
         .catch(e => {
             console.log(e);
-            res.status(500).json({ done: false, message: 'Customer not added due to an error.' });
+            res.status(500).json({ done: false, message: 'Something went wrong when adding a customer!' });
         });
 
 });
